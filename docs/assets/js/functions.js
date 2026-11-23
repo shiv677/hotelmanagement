@@ -73,7 +73,7 @@ var e = {
         e.parallaxBG();
     },
     isVariableDefined: function (el) {
-        return typeof !!el && (el) != 'undefined' && el != null;
+        return typeof el !== 'undefined' && el !== null;
     },
     getParents: function (el, selector, filter) {
         const result = [];
@@ -130,10 +130,20 @@ var e = {
     },
     on: function (selectors, type, listener) {
         document.addEventListener("DOMContentLoaded", () => {
-            if (!(selectors instanceof HTMLElement) && selectors !== null) {
+            if (Array.isArray(selectors)) {
+                selectors.forEach((el) => {
+                    if (el && typeof el.addEventListener === 'function') {
+                        el.addEventListener(type, listener);
+                    }
+                });
+                return;
+            }
+            if (!(selectors instanceof HTMLElement) && typeof selectors === 'string') {
                 selectors = document.querySelector(selectors);
             }
-            selectors.addEventListener(type, listener);
+            if (selectors && typeof selectors.addEventListener === 'function') {
+                selectors.addEventListener(type, listener);
+            }
         });
     },
     onAll: function (selectors, type, listener) {
@@ -161,7 +171,7 @@ var e = {
         }
     },
     removeAllClass: function (selectors, className) {
-        if (e.isVariableDefined(selectors) && (selectors instanceof HTMLElement)) {
+        if (e.isVariableDefined(selectors) && typeof selectors === 'string') {
             document.querySelectorAll(selectors).forEach((element) => {
                 element.removeClass(className);
             });
@@ -177,7 +187,7 @@ var e = {
         }
     },
     toggleAllClass: function (selectors, className) {
-        if (e.isVariableDefined(selectors)  && (selectors instanceof HTMLElement)) {
+        if (e.isVariableDefined(selectors) && typeof selectors === 'string') {
             document.querySelectorAll(selectors).forEach((element) => {
                 element.toggleClass(className);
             });
@@ -504,10 +514,10 @@ var e = {
                   autoplayHoverPause: sliderHoverPause,
                   autoplayButton: false,
                   autoplayButtonOutput: false,
-                  controlsPosition: top,
+                  controlsPosition: 'top',
                   navContainer: sliderNavContainer,
-                  navPosition: top,
-                  autoplayPosition: top,
+                  navPosition: 'top',
+                  autoplayPosition: 'top',
                   controlsText: [
                       '<i class="bi bi-arrow-left"></i>',
                       '<i class="bi bi-arrow-right"></i>'
@@ -571,7 +581,7 @@ e.init();
 
 /* Clipboard JS - Copy code button */
 var cl = document.querySelector('.copy-link');
-if(typeof !!cl && (cl) != 'undefined' && cl != null) {
+if (typeof cl !== 'undefined' && cl !== null) {
         var cle = document.querySelectorAll('.copy-link');
         cle.forEach(el => {
             el.addEventListener("click", function () {
